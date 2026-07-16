@@ -7,6 +7,26 @@ const taskList = document.getElementById('task-List');
 const savedTasks = localStorage.getItem('tasks');
 const todos = savedTasks ? JSON.parse(savedTasks) : [];
 
-function addTask() {
+function saveToDos() {
     localStorage.setItem('tasks', JSON.stringify(todos));
+}
+
+function createNode(taskList, index){
+    const li = document.createElement('li');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = !!taskList.completed;
+    checkbox.addEventListener("change", ()=> {
+        taskList.completed = checkbox.checked;
+    })
+
+    saveToDos();
+}
+
+function renderTasks(){
+    taskList.innerHTML = '';
+    todos.forEach((task, index) => {
+        const node = createNode(taskList, index);
+        taskList.appendChild(node);
+    });
 }
