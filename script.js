@@ -21,6 +21,20 @@ function createNode(taskList, index){
     })
 
     saveToDos();
+    const textSpan = document.createElement('span');
+    textSpan.textContent = taskList.text;
+    textSpan.style.margin = '0 10px';
+    if(taskList.completed) {
+        textSpan.style.textDecoration = 'line-through';
+    }
+    textSpan.addEventListener('dblclick', () => {
+        const newText = prompt('Edit task:', taskList.text);
+        if (newText !== null && newText.trim() !== '') {
+            taskList.text = newText.trim();
+            textSpan.textContent = taskList.text;
+            saveToDos();
+        }
+    });
 }
 
 function renderTasks(){
