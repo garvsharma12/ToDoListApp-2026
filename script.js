@@ -1,14 +1,17 @@
-// select DOM elements
-const taskInput = document.getElementById('taskInput');
-const addBtn = document.getElementById('add-btn');
-const taskList = document.getElementById('task-List');
+const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
+const storage = isBrowser && window.localStorage ? window.localStorage : null;
 
-// Try to load saved tasks from localStorage
-const savedTasks = localStorage.getItem('tasks');
+const taskInput = isBrowser ? document.getElementById('taskInput') : null;
+const addBtn = isBrowser ? document.getElementById('add-btn') : null;
+const taskList = isBrowser ? document.getElementById('task-List') : null;
+
+const savedTasks = storage ? storage.getItem('tasks') : null;
 const todos = savedTasks ? JSON.parse(savedTasks) : [];
 
 function saveToDos() {
-    localStorage.setItem('tasks', JSON.stringify(todos));
+    if (storage) {
+        storage.setItem('tasks', JSON.stringify(todos));
+    }
 }
 
 function createNode(task, index) {
@@ -57,6 +60,8 @@ function createNode(task, index) {
 }
 
 function renderTasks() {
+    if (!taskList) return;
+
     taskList.innerHTML = '';
     todos.forEach((task, index) => {
         const node = createNode(task, index);
@@ -64,20 +69,27 @@ function renderTasks() {
     });
 }
 
-addBtn.addEventListener('click', () => {
-    const newTaskText = taskInput.value.trim();
-    if (newTaskText) {
-        todos.push({ text: newTaskText, completed: false });
+function addTask() {
+    if (!taskInput || !addBtn) return;
+
+    const text = taskInput.value.trim();
+    if (text) {
+        todos.push({ text, completed: false });
         taskInput.value = '';
         saveToDos();
         renderTasks();
     }
-});
+}
 
-taskInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') {
-        addBtn.click();
-    }
-});
+if (isBrowser) {
+    addBtn.addEventListener('click', addTask);
 
-renderTasks();
+    taskInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            addTask();
+        }
+    });
+
+    renderTasks();
+}
